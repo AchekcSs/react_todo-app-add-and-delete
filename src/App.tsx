@@ -8,8 +8,8 @@ import { Footer } from './components/Footer';
 import { NewTodoForm } from './components/NewTodoForm';
 import { TodoList } from './components/TodoList';
 
-import { FilterBy } from './types/Filter';
-import { TempTodo, Todo } from './types/Todo';
+import type { FilterBy } from './types/Filter';
+import type { TempTodo, Todo } from './types/Todo';
 
 const ERROR_MESSAGE_DISAPPEARS_AFTER = 3000;
 

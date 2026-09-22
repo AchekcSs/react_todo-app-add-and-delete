@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import cn from 'classnames';
 
-import { TempTodo, Todo } from '../../types/Todo';
+import type { TempTodo, Todo } from '../../types/Todo';
 
 type Props = {
   todo: Todo | TempTodo | null;

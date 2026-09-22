@@ -1,11 +1,11 @@
 import { TodoFilter } from '../TodoFilter';
 
-import { FilterBy } from '../../types/Filter';
-import { Todo } from '../../types/Todo';
+import type { FilterBy } from '../../types/Filter';
+import type { Todo } from '../../types/Todo';
 
 type Props = {
   filterBy: FilterBy;
-  onFilterSelect: (newFilterBy: FilterBy) => void;
+  onFilterSelect: (filterBy: FilterBy) => void;
   activeTodos: Todo[];
   completedTodos: Todo[];
   onDeleteCompleted: () => void;
