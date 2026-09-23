@@ -2,13 +2,10 @@ import cn from 'classnames';
 
 type Props = {
   errorMessage: string;
-  onErrorMessageHide: (newErrorMessage: string) => void;
+  onClose: () => void;
 };
 
-export const ErrorNotification = ({
-  errorMessage,
-  onErrorMessageHide,
-}: Props) => {
+export const ErrorNotification = ({ errorMessage, onClose }: Props) => {
   return (
     <div
       data-cy="ErrorNotification"
@@ -20,7 +17,7 @@ export const ErrorNotification = ({
         data-cy="HideErrorButton"
         type="button"
         className="delete"
-        onClick={() => onErrorMessageHide('')}
+        onClick={() => onClose()}
       />
       {errorMessage}
     </div>

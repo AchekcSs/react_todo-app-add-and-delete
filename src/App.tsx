@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import cn from 'classnames';
 
-import { createTodo, deleteTodo, getTodos, USER_ID } from './api/todos';
+import * as todoService from './api/todos';
+import {
+  ERROR_MESSAGE_DISAPPEARS_AFTER,
+  ERROR_MESSAGES,
+} from './constants/errorMessages';
 
 import { ErrorNotification } from './components/ErrorNotification';
-import { Footer } from './components/Footer';
-import { NewTodoForm } from './components/NewTodoForm';
 import { TodoList } from './components/TodoList';
+import { Header } from './components/Header';
+import { Footer } from './components/Footer';
 
 import type { FilterBy } from './types/Filter';
 import type { TempTodo, Todo } from './types/Todo';
-
-const ERROR_MESSAGE_DISAPPEARS_AFTER = 3000;
 
 const getVisibleTodos = (todos: Todo[], filterBy: FilterBy) => {
   let visibleTodos = [...todos];
@@ -31,7 +32,7 @@ const getVisibleTodos = (todos: Todo[], filterBy: FilterBy) => {
 
 const validateQuery = (processedQuery: string) => {
   if (!processedQuery) {
-    return 'Title should not be empty';
+    return ERROR_MESSAGES.EMPTY_TITLE;
   }
 
   return '';
@@ -59,9 +60,10 @@ export const App = () => {
 
     setErrorMessage('');
 
-    getTodos()
+    todoService
+      .getTodos()
       .then(setTodos)
-      .catch(() => setErrorMessage('Unable to load todos'));
+      .catch(() => setErrorMessage(ERROR_MESSAGES.LOAD_TODOS));
   }, []);
 
   useEffect(() => {
@@ -92,7 +94,8 @@ export const App = () => {
   const handleTodoDelete = (todoId: number) => {
     setDeletingTodoIds(prev => new Set(prev).add(todoId));
 
-    deleteTodo(todoId)
+    todoService
+      .deleteTodo(todoId)
       .then(() => {
         setTodos(prev => prev.filter(todo => todo.id !== todoId));
 
@@ -100,7 +103,7 @@ export const App = () => {
           inputRef.current.focus();
         }
       })
-      .catch(() => setErrorMessage('Unable to delete a todo'))
+      .catch(() => setErrorMessage(ERROR_MESSAGES.DELETE_TODO))
       .finally(() => {
         setDeletingTodoIds(prev => {
           const next = new Set(prev);
@@ -124,7 +127,8 @@ export const App = () => {
     });
 
     completedIds.forEach(id => {
-      deleteTodo(id)
+      todoService
+        .deleteTodo(id)
         .then(() => {
           setTodos(prev => prev.filter(todo => todo.id !== id));
 
@@ -132,7 +136,7 @@ export const App = () => {
             inputRef.current.focus();
           }
         })
-        .catch(() => setErrorMessage('Unable to delete a todo'))
+        .catch(() => setErrorMessage(ERROR_MESSAGES.DELETE_TODO))
         .finally(() => {
           setDeletingTodoIds(prev => {
             const next = new Set(prev);
@@ -159,7 +163,7 @@ export const App = () => {
     }
 
     const newTodoData = {
-      userId: USER_ID,
+      userId: todoService.USER_ID,
       title: processedQuery,
       completed: false,
     };
@@ -167,12 +171,13 @@ export const App = () => {
     setIsLoading(true);
     setTempTodo({ id: 0, title: processedQuery });
 
-    createTodo(newTodoData)
+    todoService
+      .createTodo(newTodoData)
       .then(response => {
         setTodos(prev => [...prev, response]);
         setQuery('');
       })
-      .catch(() => setErrorMessage('Unable to add a todo'))
+      .catch(() => setErrorMessage(ERROR_MESSAGES.ADD_TODO))
       .finally(() => {
         setTempTodo(null);
         setIsLoading(false);
@@ -184,23 +189,15 @@ export const App = () => {
       <h1 className="todoapp__title">todos</h1>
 
       <div className="todoapp__content">
-        <header className="todoapp__header">
-          <button
-            type="button"
-            className={cn('todoapp__toggle-all', {
-              active: todos.length === completedTodos.length,
-            })}
-            data-cy="ToggleAllButton"
-          />
-
-          <NewTodoForm
-            onFormSubmit={handleFormSubmit}
-            query={query}
-            onQueryChange={setQuery}
-            isLoading={isLoading}
-            inputRef={inputRef}
-          />
-        </header>
+        <Header
+          todos={todos}
+          completedTodos={completedTodos}
+          onFormSubmit={handleFormSubmit}
+          query={query}
+          onQueryChange={setQuery}
+          isLoading={isLoading}
+          inputRef={inputRef}
+        />
 
         {todos.length > 0 && (
           <>
@@ -224,7 +221,7 @@ export const App = () => {
 
       <ErrorNotification
         errorMessage={errorMessage}
-        onErrorMessageHide={setErrorMessage}
+        onClose={() => setErrorMessage('')}
       />
     </div>
   );
